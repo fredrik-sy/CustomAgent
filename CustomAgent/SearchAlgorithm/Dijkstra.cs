@@ -1,0 +1,283 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Quoridor.AI
+{
+    class Dijkstra
+    {
+        private Graph graph;
+        private Player player;
+
+        public Dijkstra(Graph graph, Player player)
+        {
+            this.graph = graph;
+            this.player = player;
+        }
+
+        public List<int> Path { get; private set; }
+
+        public void CreatePath(Dijkstra collision = null)
+        {
+            PriorityQueue<int> vertexSet = new PriorityQueue<int>(81);
+            int[] distance = new int[graph.V];
+            int[] previous = new int[graph.V];
+
+            bool collisionOccurred = false;
+            int collisionCheckpoint = -1;
+            int source = player.Position();
+
+            distance[source] = 0;
+
+            for (int v = 0; v < graph.V; v++)
+            {
+                if (v != source)
+                    distance[v] = QuoridorGraph.SQUARE_SPACES;
+
+                previous[v] = -1;
+                vertexSet.Insert(v, distance[v]);
+            }
+
+            while (!vertexSet.Empty)
+            {
+                int u = vertexSet.DeleteMin();
+
+                foreach (int v in QuoridorGraph.Graph.Adj(u))
+                {
+                    int alt = distance[u] + 1;
+
+                    if (alt < distance[v])
+                    {
+                        if (collision != null)
+                        {
+                            /* Collision Check When Near Opponent */
+                            if (alt == 1)
+                            {
+                                if (v == collision.player.Position())
+                                {
+                                    if (player.Active())
+                                        continue;
+                                    else
+                                        collisionOccurred = true;
+                                }
+                            }
+                            else if (collision.Path != null && alt - 1 < collision.Path.Count)    /* Collision Check When Player Meets */
+                            {
+                                if (v == collision.Path[collision.Path.Count - (alt - 1)])  /* LIFO List */
+                                {
+                                    if (player.Active())
+                                    {
+                                        collisionCheckpoint = u;
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        collisionOccurred = true;
+                                    }
+                                }
+                            }
+
+                            /* Collision Check On Same Position */
+                            if (collision.Path != null && alt < collision.Path.Count)
+                            {
+                                if (v == collision.Path[collision.Path.Count - alt])
+                                {
+                                    if (player.Active())
+                                    {
+                                        collisionOccurred = true;
+                                    }
+                                    else
+                                    {
+                                        collisionCheckpoint = u;
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+
+                        distance[v] = alt;
+                        previous[v] = u;
+                        vertexSet.DecreaseKey(v, alt);
+                    }
+                }
+            }
+
+            Path = ReconstructPath(player.Goals(), distance, previous);
+
+            if (Path == null && collision != null)
+            {
+                List<int> goals = new List<int>();
+
+                /* Opponent Blocking Path */
+                if (collisionCheckpoint != -1)
+                {
+                    if (distance[collisionCheckpoint] != QuoridorGraph.SQUARE_SPACES)
+                        goals.Add(collisionCheckpoint);
+
+                    Path = ReconstructPath(goals, distance, previous);
+                }
+
+                /* Opponent Body Blocking - Random Walk In Any Direction */
+                if (goals.Count == 0)
+                {
+                    foreach (int v in graph.Adj(player.Position()))
+                    {
+                        if (distance[v] != QuoridorGraph.SQUARE_SPACES)
+                        {
+                            Path = ReconstructPath(v, distance, previous);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (collisionOccurred)
+                collision.CreatePath(this);
+        }
+
+        private List<int> ReconstructPath(int goal, int[] distance, int[] previous)
+        {
+            List<int> goals = new List<int>(1);
+            goals.Add(goal);
+            return ReconstructPath(goals, distance, previous);
+        }
+
+        private List<int> ReconstructPath(List<int> goals, int[] distance, int[] previous)
+        {
+            int cheapestDistance = QuoridorGraph.SQUARE_SPACES;
+            int v = -1;
+
+            foreach (int g in goals)
+            {
+                if (distance[g] < cheapestDistance)
+                {
+                    cheapestDistance = distance[g];
+                    v = g;
+                }
+            }
+
+            /* Opponent/Wall-Isolation Block */
+            if (cheapestDistance == QuoridorGraph.SQUARE_SPACES)
+                return null;
+
+            List<int> cheapestPath = new List<int>();
+
+            while (previous[v] != -1)
+            {
+                cheapestPath.Add(v);
+                v = previous[v];
+            }
+
+            return cheapestPath;
+        }
+
+        //public static Dictionary<Player, List<int>> Paths = new Dictionary<Player, List<int>>();
+
+        //public static void CreatePaths()
+        //{
+        //    Paths[PlayerExtension.Self] = SearchPath(QuoridorGraph.Graph, PlayerExtension.Self, PlayerExtension.Opponent);
+        //    Paths[PlayerExtension.Opponent] = SearchPath(QuoridorGraph.Graph, PlayerExtension.Opponent, PlayerExtension.Self);
+        //}
+
+        //public static List<int> SearchPath(Graph graph, Player player1, Player player2, List<int> player2Path = null)
+        //{
+        //    PriorityQueue<int> vertexSet = new PriorityQueue<int>(81);
+        //    int[] distance = new int[graph.V];
+        //    int[] previous = new int[graph.V];
+
+        //    int source = player1.Position();
+
+        //    distance[source] = 0;
+
+        //    for (int v = 0; v < graph.V; v++)
+        //    {
+        //        if (v != source)
+        //            distance[v] = QuoridorGraph.SQUARE_SPACES;
+
+        //        previous[v] = -1;
+        //        vertexSet.Insert(v, distance[v]);
+        //    }
+
+        //    while (!vertexSet.Empty)
+        //    {
+        //        int u = vertexSet.DeleteMin();
+
+        //        foreach (int v in QuoridorGraph.Graph.Adj(u))
+        //        {
+        //            int alt = distance[u] + 1;
+
+        //            if (Paths[player2].Contains(v))
+        //            {
+
+        //            }
+
+        //            if (alt < distance[v])
+        //            {
+        //                distance[v] = alt;
+        //                previous[v] = u;
+        //                vertexSet.DecreaseKey(v, alt);
+        //            }
+        //        }
+        //    }
+
+        //    List<int> cheapestPath = ReconstructPath(player1.Goals(), distance, previous);
+
+        //    if (cheapestPath == null)
+        //    {
+        //        List<int> goals = new List<int>();
+
+        //        /* Opponent Blocking Path */
+        //        foreach (int v in graph.Adj(player2.Position()))
+        //            if (distance[v] != QuoridorGraph.SQUARE_SPACES)
+        //                goals.Add(v);
+
+        //        /* Opponent Body Blocking */
+        //        if (goals.Count == 0)
+        //            foreach (int v in graph.Adj(player2.Position()))
+        //                if (distance[v] != QuoridorGraph.SQUARE_SPACES)
+        //                    return ReconstructPath(v, distance, previous);
+
+        //        cheapestPath = ReconstructPath(goals, distance, previous);
+        //    }
+
+        //    return cheapestPath;
+        //}
+
+        //public static List<int> ReconstructPath(int goal, int[] distance, int[] previous)
+        //{
+        //    List<int> goals = new List<int>(1);
+        //    goals.Add(goal);
+        //    return ReconstructPath(goals, distance, previous);
+        //}
+
+        //public static List<int> ReconstructPath(List<int> goals, int[] distance, int[] previous)
+        //{
+        //    int cheapestDistance = QuoridorGraph.SQUARE_SPACES;
+        //    int v = -1;
+
+        //    foreach (int g in goals)
+        //    {
+        //        if (distance[g] < cheapestDistance)
+        //        {
+        //            cheapestDistance = distance[g];
+        //            v = g;
+        //        }
+        //    }
+
+        //    if (cheapestDistance == QuoridorGraph.SQUARE_SPACES)
+        //        return null;
+
+        //    List<int> cheapestPath = new List<int>();
+
+        //    while (previous[v] != -1)
+        //    {
+        //        cheapestPath.Add(v);
+        //        v = previous[v];
+        //    }
+
+        //    return cheapestPath;
+        //}
+    }
+}
