@@ -131,13 +131,6 @@ namespace Quoridor.AI
                 PlayerExtension.Self.Goals().Contains(PlayerExtension.Self.Position()) ||
                 PlayerExtension.Opponent.Goals().Contains(PlayerExtension.Opponent.Position()))
             {
-                /* Wall Isolation */
-                //if (dijkstraSelf.Path == null || dijkstraOpponent.Path == null)
-                //{
-                //    heuristicValue = maximizingPlayer ? int.MaxValue : int.MinValue;
-                //    return true;
-                //}
-
                 heuristicValue += dijkstraOpponent.Path.Count - dijkstraSelf.Path.Count;
                 return true;
             }
