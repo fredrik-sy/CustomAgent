@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -122,14 +123,22 @@ namespace Quoridor.AI
                 /* Opponent Body Blocking - Random Walk In Any Direction */
                 if (goals.Count == 0)
                 {
+                    int w = -1;
+
                     foreach (int v in graph.Adj(player.Position()))
                     {
                         if (distance[v] != QuoridorGraph.SQUARE_SPACES)
                         {
-                            Path = ReconstructPath(v, distance, previous);
-                            break;
+                            w = v;
+
+                            /* Avoid Opponents Path If Possible */
+                            if (collision.Path != null && !collision.Path.Contains(distance[v]))
+                                break;
                         }
                     }
+
+                    if (w != -1)
+                        Path = ReconstructPath(w, distance, previous);
                 }
             }
 
