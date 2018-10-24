@@ -91,6 +91,10 @@ namespace Quoridor.AI
                 }
             }
 
+            Debug.Print(action.GetType().IsAssignableFrom(typeof(MoveAction)) ?
+                ((Func<MoveAction, string>)((MoveAction moveAction) => "(" + moveAction.Column + ", " + moveAction.Row + ")"))((MoveAction)action) :
+                ((Func<PlaceWallAction, string>)((PlaceWallAction placeWallAction) => "(" + placeWallAction.Column + ", " + placeWallAction.Row + ") " + placeWallAction.WallAlignment))((PlaceWallAction)action));
+
             return action;
         }
     }

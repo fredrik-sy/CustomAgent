@@ -26,6 +26,7 @@ namespace Quoridor.AI
             int[] distance = new int[graph.V];
             int[] previous = new int[graph.V];
 
+            bool opponentCloseBy = false;
             bool collisionOccurred = false;
             int collisionCheckpoint = -1;
             int source = player.Position();
@@ -58,6 +59,8 @@ namespace Quoridor.AI
                             {
                                 if (v == collision.player.Position())
                                 {
+                                    opponentCloseBy = true;
+
                                     if (player.Active())
                                         continue;
                                     else
@@ -121,7 +124,7 @@ namespace Quoridor.AI
                 }
 
                 /* Opponent Body Blocking - Random Walk In Any Direction */
-                if (goals.Count == 0)
+                if (goals.Count == 0 && opponentCloseBy)
                 {
                     int w = -1;
 

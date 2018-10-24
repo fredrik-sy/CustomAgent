@@ -70,7 +70,7 @@ namespace Quoridor.AI
                     }
                 }
 
-                return value;
+                return value == int.MinValue ? int.MaxValue : value;
             }
             else
             {
@@ -119,7 +119,7 @@ namespace Quoridor.AI
                     }
                 }
 
-                return value;
+                return value == int.MaxValue ? int.MinValue : value;
             }
         }
 
