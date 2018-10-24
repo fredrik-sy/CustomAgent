@@ -10,6 +10,9 @@ namespace Quoridor.AI
     {
         public static int Evaluate(int depth, int alpha, int beta, bool maximizingPlayer)
         {
+            if (ReachedTerminal(depth, maximizingPlayer, out int heuristicValue))
+                return heuristicValue;
+
             Dijkstra dijkstraSelf = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Self);
             Dijkstra dijkstraOpponent = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Opponent);
 
@@ -19,9 +22,6 @@ namespace Quoridor.AI
             /* Wall Isolation */
             if (dijkstraSelf.Path == null || dijkstraOpponent.Path == null)
                 return maximizingPlayer ? int.MaxValue : int.MinValue;
-
-            if (ReachedTerminal(dijkstraSelf, dijkstraOpponent, depth, maximizingPlayer, out int heuristicValue))
-                return heuristicValue;
 
             if (maximizingPlayer)
             {
@@ -123,7 +123,7 @@ namespace Quoridor.AI
             }
         }
 
-        private static bool ReachedTerminal(Dijkstra dijkstraSelf, Dijkstra dijkstraOpponent, int depth, bool maximizingPlayer, out int heuristicValue)
+        private static bool ReachedTerminal(int depth, bool maximizingPlayer, out int heuristicValue)
         {
             heuristicValue = 0;
 
@@ -131,7 +131,18 @@ namespace Quoridor.AI
                 PlayerExtension.Self.Goals().Contains(PlayerExtension.Self.Position()) ||
                 PlayerExtension.Opponent.Goals().Contains(PlayerExtension.Opponent.Position()))
             {
-                heuristicValue += dijkstraOpponent.Path.Count - dijkstraSelf.Path.Count;
+                Dijkstra dijkstraSelf = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Self);
+                Dijkstra dijkstraOpponent = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Opponent);
+
+                dijkstraSelf.CreatePath();
+                dijkstraOpponent.CreatePath();
+
+                /* Wall Isolation */
+                if (dijkstraSelf.Path == null || dijkstraOpponent.Path == null)
+                    heuristicValue = maximizingPlayer ? int.MaxValue : int.MinValue;
+                else
+                    heuristicValue += dijkstraOpponent.Path.Count - dijkstraSelf.Path.Count;
+
                 return true;
             }
 
