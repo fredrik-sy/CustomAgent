@@ -6,7 +6,7 @@ namespace Quoridor.AI
 {
     class CustomAgent : Agent
     {
-        private const int ALPHA_BETA_PRUNING_DEPTH = 3;
+        private const int ALPHA_BETA_PRUNING_DEPTH = 4; // >= 0
 
         public static void Main()
         {
@@ -91,9 +91,9 @@ namespace Quoridor.AI
                 }
             }
 
-            Debug.Print(action.GetType().IsAssignableFrom(typeof(MoveAction)) ?
-                ((Func<MoveAction, string>)((MoveAction moveAction) => "(" + moveAction.Column + ", " + moveAction.Row + ")"))((MoveAction)action) :
-                ((Func<PlaceWallAction, string>)((PlaceWallAction placeWallAction) => "(" + placeWallAction.Column + ", " + placeWallAction.Row + ") " + placeWallAction.WallAlignment))((PlaceWallAction)action));
+            //Debug.Print(action.GetType().IsAssignableFrom(typeof(MoveAction)) ?
+            //    ((Func<MoveAction, string>)((MoveAction moveAction) => "(" + moveAction.Column + ", " + moveAction.Row + ")"))((MoveAction)action) :
+            //    ((Func<PlaceWallAction, string>)((PlaceWallAction placeWallAction) => "(" + placeWallAction.Column + ", " + placeWallAction.Row + ") " + placeWallAction.WallAlignment))((PlaceWallAction)action));
 
             return action;
         }

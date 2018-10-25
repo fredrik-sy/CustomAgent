@@ -10,6 +10,8 @@ namespace Quoridor.AI
     {
         public const int BOARD_SIZE = 9;
         public const int SQUARE_SPACES = 81;
+        private const int LIMIT_WALL_BEGIN = 4;
+        private const int LIMIT_WALL_END = 2;
 
         public static Graph Graph;
 
@@ -35,7 +37,7 @@ namespace Quoridor.AI
             HashSet<int> horizontal = new HashSet<int>();
             HashSet<int> vertical = new HashSet<int>();
 
-            foreach (int v in cheapestPath.ForEachReverse())
+            foreach (int v in cheapestPath.ForEachRangeReverse(LIMIT_WALL_BEGIN, LIMIT_WALL_END))
             {
                 #region PlaceHorizontalWall
                 if (PlayerExtension.PlaceHorizontalWall(v))
