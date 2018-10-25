@@ -8,11 +8,22 @@ namespace Quoridor.AI
 {
     static class ListExtension
     {
-        public static IEnumerable<TSource> ForEachReverse<TSource>(this List<TSource> source)
+        public static IEnumerable<TSource> ForEachReverse<TSource>(this List<TSource> source, int beginCount = QuoridorGraph.SQUARE_SPACES, int endCount = 0)
         {
-            for (int i = source.Count - 1; i > -1; i--)
+            if (source.Count <= beginCount + endCount)
             {
-                yield return source[i];
+                for (int i = source.Count - 1; i > -1; i--)
+                    yield return source[i];
+            }
+            else
+            {
+                beginCount = Clamp((source.Count - 1) - beginCount, -1, source.Count);
+
+                for (int i = source.Count - 1; i > beginCount; i--)
+                    yield return source[i];
+
+                for (int i = endCount - 1; i > -1; i--)
+                    yield return source[i];
             }
         }
 
@@ -27,6 +38,11 @@ namespace Quoridor.AI
             TSource item = source[source.Count - 1];
             source.RemoveAt(source.Count - 1);
             return item;
+        }
+
+        private static int Clamp(int value, int min, int max)
+        {
+            return (value < min) ? min : (value > max) ? max : value;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Quoridor.AI
             HashSet<int> horizontal = new HashSet<int>();
             HashSet<int> vertical = new HashSet<int>();
 
-            foreach (int v in cheapestPath.ForEachReverse())
+            foreach (int v in cheapestPath.ForEachReverse(CustomAgent.LIMIT_WALL_BEGIN_COUNT, CustomAgent.LIMIT_WALL_END_COUNT))
             {
                 #region PlaceHorizontalWall
                 if (PlayerExtension.PlaceHorizontalWall(v))
