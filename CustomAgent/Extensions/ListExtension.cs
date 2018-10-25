@@ -17,7 +17,7 @@ namespace Quoridor.AI
             }
             else
             {
-                beginCount = Clamp((source.Count - 1) - beginCount, -1, source.Count);
+                beginCount = (source.Count - 1) - beginCount;
 
                 for (int i = source.Count - 1; i > beginCount; i--)
                     yield return source[i];
