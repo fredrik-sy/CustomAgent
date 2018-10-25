@@ -9,7 +9,7 @@ namespace Quoridor.AI
         /* Depth >= 0 */
         public const int ALPHA_BETA_PRUNING_DEPTH = 4;
 
-        /* Removes Element In The Middle Of List */
+        /* Ignore Middle Wall Element If List.Count >= LIMIT_WALL_BEGIN_COUNT + LIMIT_WALL_END_COUNT */
         public const int LIMIT_WALL_BEGIN_COUNT = 4;
         public const int LIMIT_WALL_END_COUNT = 2;
 
