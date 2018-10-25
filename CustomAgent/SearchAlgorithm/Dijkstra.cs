@@ -18,6 +18,7 @@ namespace Quoridor.AI
             this.player = player;
         }
 
+        public bool OpponentCloseBy { get; set; }
         public List<int> Path { get; private set; }
 
         public void CreatePath(Dijkstra collision = null)
@@ -26,7 +27,7 @@ namespace Quoridor.AI
             int[] distance = new int[graph.V];
             int[] previous = new int[graph.V];
 
-            bool opponentCloseBy = false;
+            OpponentCloseBy = false;
             bool collisionOccurred = false;
             int collisionCheckpoint = -1;
             int source = player.Position();
@@ -59,7 +60,7 @@ namespace Quoridor.AI
                             {
                                 if (v == collision.player.Position())
                                 {
-                                    opponentCloseBy = true;
+                                    OpponentCloseBy = true;
 
                                     if (player.Active())
                                         continue;
@@ -124,7 +125,7 @@ namespace Quoridor.AI
                 }
 
                 /* Opponent Body Blocking - Random Walk In Any Direction */
-                if (goals.Count == 0 && opponentCloseBy)
+                if (goals.Count == 0 && OpponentCloseBy)
                 {
                     int w = -1;
 

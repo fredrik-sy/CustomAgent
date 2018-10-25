@@ -31,34 +31,24 @@ namespace Quoridor.AI
         {
             Action action = default(Action);
             int actionScore = int.MinValue;
+            int score;
 
             Dijkstra dijkstraSelf = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Self);
             Dijkstra dijkstraOpponent = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Opponent);
 
             dijkstraSelf.CreatePath();
+
+            var selfUntouchedWallPositions = QuoridorGraph.WallPossibilities(dijkstraSelf.Path, LIMIT_WALL_BEGIN_COUNT, LIMIT_WALL_END_COUNT);
+
             dijkstraOpponent.CreatePath(dijkstraSelf);
-
-            #region EvaluateMove
-            int v = dijkstraSelf.Path.Peek();
-
-            PlayerExtension.Self.Move(v);
-
-            int score = AlphaBetaPruning.Evaluate(ALPHA_BETA_PRUNING_DEPTH, int.MinValue, int.MaxValue, false);
-
-            if (actionScore < score)
-            {
-                action = new MoveAction(QuoridorGraph.ToX(v), QuoridorGraph.ToY(v));
-                actionScore = score;
-            }
-
-            PlayerExtension.Self.RevertMove();
-            #endregion
 
             if (PlayerExtension.Self.HasWall())
             {
-                if (dijkstraSelf.Path.Count > dijkstraOpponent.Path.Count)
+                if (dijkstraSelf.Path.Count > dijkstraOpponent.Path.Count || dijkstraSelf.OpponentCloseBy)
                 {
-                    var wallPositions = QuoridorGraph.WallPossibilities(dijkstraOpponent.Path);
+                    var wallPositions = dijkstraSelf.OpponentCloseBy ? QuoridorGraph.WallPossibilities(dijkstraOpponent.Path, LIMIT_WALL_BEGIN_COUNT, LIMIT_WALL_END_COUNT)
+                        .Join(selfUntouchedWallPositions)
+                        : QuoridorGraph.WallPossibilities(dijkstraOpponent.Path, LIMIT_WALL_BEGIN_COUNT, LIMIT_WALL_END_COUNT);
 
                     #region EvaluateHorizontal
                     foreach (int horizontalWallPosition in wallPositions[WallOrientation.Horizontal])
@@ -95,6 +85,22 @@ namespace Quoridor.AI
                     #endregion
                 }
             }
+
+            #region EvaluateMove
+            int v = dijkstraSelf.Path.Peek();
+
+            PlayerExtension.Self.Move(v);
+
+            score = AlphaBetaPruning.Evaluate(ALPHA_BETA_PRUNING_DEPTH, int.MinValue, int.MaxValue, false);
+
+            if (actionScore < score)
+            {
+                action = new MoveAction(QuoridorGraph.ToX(v), QuoridorGraph.ToY(v));
+                actionScore = score;
+            }
+
+            PlayerExtension.Self.RevertMove();
+            #endregion
 
             //Debug.Print(action.GetType().IsAssignableFrom(typeof(MoveAction)) ?
             //    ((Func<MoveAction, string>)((MoveAction moveAction) => "(" + moveAction.Column + ", " + moveAction.Row + ")"))((MoveAction)action) :

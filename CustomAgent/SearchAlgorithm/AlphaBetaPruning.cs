@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,8 +41,8 @@ namespace Quoridor.AI
                 {
                     if (dijkstraSelf.Path.Count > dijkstraOpponent.Path.Count)
                     {
-                        var wallPositions = QuoridorGraph.WallPossibilities(dijkstraOpponent.Path);
-
+                        var wallPositions = QuoridorGraph.WallPossibilities(dijkstraOpponent.Path, CustomAgent.LIMIT_WALL_BEGIN_COUNT, CustomAgent.LIMIT_WALL_END_COUNT);
+                        
                         #region EvaluateHorizontal
                         foreach (int horizontalWallPosition in wallPositions[WallOrientation.Horizontal])
                         {
@@ -89,7 +90,7 @@ namespace Quoridor.AI
                 {
                     if (dijkstraOpponent.Path.Count > dijkstraSelf.Path.Count)
                     {
-                        var wallPositions = QuoridorGraph.WallPossibilities(dijkstraSelf.Path);
+                        var wallPositions = QuoridorGraph.WallPossibilities(dijkstraSelf.Path, CustomAgent.LIMIT_WALL_BEGIN_COUNT, CustomAgent.LIMIT_WALL_END_COUNT);
 
                         #region EvaluateHorizontal
                         foreach (int horizontalWallPosition in wallPositions[WallOrientation.Horizontal])
@@ -125,7 +126,6 @@ namespace Quoridor.AI
 
         private static bool ReachedTerminal(int depth, bool maximizingPlayer, out int heuristicValue)
         {
-            heuristicValue = 0;
 
             if (depth == 0 ||
                 PlayerExtension.Self.Goals().Contains(PlayerExtension.Self.Position()) ||
@@ -141,11 +141,12 @@ namespace Quoridor.AI
                 if (dijkstraSelf.Path == null || dijkstraOpponent.Path == null)
                     heuristicValue = maximizingPlayer ? int.MaxValue : int.MinValue;
                 else
-                    heuristicValue += dijkstraOpponent.Path.Count - dijkstraSelf.Path.Count;
-
+                    heuristicValue = dijkstraOpponent.Path.Count - dijkstraSelf.Path.Count;
+                
                 return true;
             }
 
+            heuristicValue = 0;
             return false;
         }
 

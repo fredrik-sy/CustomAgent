@@ -103,6 +103,7 @@
   <ItemGroup>
     <Compile Include="Collections\PriorityQueue.cs" />
     <Compile Include="CustomAgent.cs" />
+    <Compile Include="Extensions\DictionaryExtension.cs" />
     <Compile Include="Extensions\ListExtension.cs" />
     <Compile Include="Graph\Graph.cs" />
     <Compile Include="Graph\QuoridorGraph.cs" />

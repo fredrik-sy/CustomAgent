@@ -11,7 +11,7 @@ namespace Quoridor.AI
         public static Player Self;
         public static Player Opponent;
 
-        #region CacheData
+        #region TempData
         private static Dictionary<Color, bool> TurnHistory = new Dictionary<Color, bool>()
         {
             { Color.Blue, false },
@@ -81,7 +81,7 @@ namespace Quoridor.AI
         {
             return GoalLocation[player.Color];
         }
-
+        
         public static int Position(this Player player)
         {
             return MoveHistory[player.Color].Count == 0 ? QuoridorGraph.BOARD_SIZE * player.Position.Y + player.Position.X : MoveHistory[player.Color].Peek();
@@ -95,6 +95,11 @@ namespace Quoridor.AI
         }
 
         #region Wall
+        public static int NumberOfWalls(this Player player)
+        {
+            return WallCount[player.Color];
+        }
+
         public static bool HasWall(this Player player)
         {
             return WallCount[player.Color] > 0;

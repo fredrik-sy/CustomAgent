@@ -30,12 +30,12 @@ namespace Quoridor.AI
             }
         }
 
-        public static Dictionary<WallOrientation, HashSet<int>> WallPossibilities(List<int> cheapestPath)
+        public static Dictionary<WallOrientation, HashSet<int>> WallPossibilities(List<int> cheapestPath, int beginCount = SQUARE_SPACES, int endCount = 0)
         {
             HashSet<int> horizontal = new HashSet<int>();
             HashSet<int> vertical = new HashSet<int>();
 
-            foreach (int v in cheapestPath.ForEachReverse(CustomAgent.LIMIT_WALL_BEGIN_COUNT, CustomAgent.LIMIT_WALL_END_COUNT))
+            foreach (int v in cheapestPath.ForEachReverse(beginCount, endCount))
             {
                 #region PlaceHorizontalWall
                 if (PlayerExtension.PlaceHorizontalWall(v))
