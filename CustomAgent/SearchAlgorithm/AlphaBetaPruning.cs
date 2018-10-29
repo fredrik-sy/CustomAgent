@@ -37,12 +37,12 @@ namespace Quoridor.AI
                 if (alpha >= beta)
                     return value;
 
-                if (PlayerExtension.Self.HasWall())
+                if (PlayerExtension.Self.NumberOfWalls() > 0)
                 {
                     if (dijkstraSelf.Path.Count > dijkstraOpponent.Path.Count)
                     {
                         var wallPositions = QuoridorGraph.WallPossibilities(dijkstraOpponent.Path, CustomAgent.LIMIT_WALL_BEGIN_COUNT, CustomAgent.LIMIT_WALL_END_COUNT);
-                        
+
                         #region EvaluateHorizontal
                         foreach (int horizontalWallPosition in wallPositions[WallOrientation.Horizontal])
                         {
@@ -86,7 +86,7 @@ namespace Quoridor.AI
                 if (alpha >= beta)
                     return value;
 
-                if (PlayerExtension.Opponent.HasWall())
+                if (PlayerExtension.Opponent.NumberOfWalls() > 0)
                 {
                     if (dijkstraOpponent.Path.Count > dijkstraSelf.Path.Count)
                     {
@@ -142,7 +142,7 @@ namespace Quoridor.AI
                     heuristicValue = maximizingPlayer ? int.MaxValue : int.MinValue;
                 else
                     heuristicValue = dijkstraOpponent.Path.Count - dijkstraSelf.Path.Count;
-                
+
                 return true;
             }
 

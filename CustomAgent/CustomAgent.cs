@@ -42,7 +42,7 @@ namespace Quoridor.AI
 
             dijkstraOpponent.CreatePath(dijkstraSelf);
 
-            if (PlayerExtension.Self.HasWall())
+            if (PlayerExtension.Self.NumberOfWalls() > 0)
             {
                 if (dijkstraSelf.Path.Count > dijkstraOpponent.Path.Count || dijkstraSelf.OpponentCloseBy)
                 {

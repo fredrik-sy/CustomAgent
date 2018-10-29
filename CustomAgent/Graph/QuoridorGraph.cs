@@ -30,6 +30,74 @@ namespace Quoridor.AI
             }
         }
 
+        #region PlaceWallAction
+        public static bool HorizontalWallVacant(int v)
+        {
+            if (v < 0 || v >= SQUARE_SPACES ||
+                ToX(v) > BOARD_SIZE - 2 ||
+                ToY(v) > BOARD_SIZE - 2)
+                return false;
+
+            return Graph.IsAdj(v, v + BOARD_SIZE) && Graph.IsAdj(v + 1, (v + 1) + BOARD_SIZE);
+        }
+
+        public static bool VerticalWallVacant(int v)
+        {
+            if (v < 0 || v >= SQUARE_SPACES ||
+                ToX(v) > BOARD_SIZE - 2 ||
+                ToY(v) > BOARD_SIZE - 2)
+                return false;
+
+            return Graph.IsAdj(v, v + 1) && Graph.IsAdj(v + BOARD_SIZE, (v + 1) + BOARD_SIZE);
+        }
+
+        public static bool PlaceHorizontalWall(int v)
+        {
+            if (HorizontalWallVacant(v))
+            {
+                Graph.RemoveUndirectedEdge(v, v + BOARD_SIZE);
+                Graph.RemoveUndirectedEdge(v + 1, (v + 1) + BOARD_SIZE);
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool PlaceVerticalWall(int v)
+        {
+            if (VerticalWallVacant(v))
+            {
+                Graph.RemoveUndirectedEdge(v, v + 1);
+                Graph.RemoveUndirectedEdge(v + BOARD_SIZE, (v + 1) + BOARD_SIZE);
+                return true;
+            }
+
+            return false;
+        }
+        
+        public static void RemoveHorizontalWall(int v)
+        {
+            if (v < 0 || v >= SQUARE_SPACES ||
+                ToX(v) > BOARD_SIZE - 2 ||
+                ToY(v) > BOARD_SIZE - 2)
+                throw new ArgumentException();
+
+            Graph.AddUndirectedEdge(v, v + BOARD_SIZE);
+            Graph.AddUndirectedEdge(v + 1, (v + 1) + BOARD_SIZE);
+        }
+
+        public static void RemoveVerticalWall(int v)
+        {
+            if (v < 0 || v >= SQUARE_SPACES ||
+                ToX(v) > BOARD_SIZE - 2 ||
+                ToY(v) > BOARD_SIZE - 2)
+                throw new ArgumentException();
+
+            Graph.AddUndirectedEdge(v, v + 1);
+            Graph.AddUndirectedEdge(v + BOARD_SIZE, (v + 1) + BOARD_SIZE);
+        }
+        #endregion
+
         public static Dictionary<WallOrientation, HashSet<int>> WallPossibilities(List<int> cheapestPath, int beginCount = SQUARE_SPACES, int endCount = 0)
         {
             HashSet<int> horizontal = new HashSet<int>();
@@ -38,55 +106,31 @@ namespace Quoridor.AI
             foreach (int v in cheapestPath.ForEachReverse(beginCount, endCount))
             {
                 #region PlaceHorizontalWall
-                if (PlayerExtension.PlaceHorizontalWall(v))
-                {
+                if (HorizontalWallVacant(v))
                     horizontal.Add(v);
-                    PlayerExtension.RemoveHorizontalWall(v);
-                }
 
-                if (PlayerExtension.PlaceHorizontalWall(v - 1))
-                {
+                if (HorizontalWallVacant(v - 1))
                     horizontal.Add(v - 1);
-                    PlayerExtension.RemoveHorizontalWall(v - 1);
-                }
 
-                if (PlayerExtension.PlaceHorizontalWall(v - BOARD_SIZE))
-                {
+                if (HorizontalWallVacant(v - BOARD_SIZE))
                     horizontal.Add(v - BOARD_SIZE);
-                    PlayerExtension.RemoveHorizontalWall(v - BOARD_SIZE);
-                }
 
-                if (PlayerExtension.PlaceHorizontalWall((v - 1) - BOARD_SIZE))
-                {
+                if (HorizontalWallVacant((v - 1) - BOARD_SIZE))
                     horizontal.Add((v - 1) - BOARD_SIZE);
-                    PlayerExtension.RemoveHorizontalWall((v - 1) - BOARD_SIZE);
-                }
                 #endregion
 
                 #region PlaceVerticalWall
-                if (PlayerExtension.PlaceVerticalWall(v))
-                {
+                if (VerticalWallVacant(v))
                     vertical.Add(v);
-                    PlayerExtension.RemoveVerticalWall(v);
-                }
 
-                if (PlayerExtension.PlaceVerticalWall(v - BOARD_SIZE))
-                {
+                if (VerticalWallVacant(v - BOARD_SIZE))
                     vertical.Add(v - BOARD_SIZE);
-                    PlayerExtension.RemoveVerticalWall(v - BOARD_SIZE);
-                }
 
-                if (PlayerExtension.PlaceVerticalWall(v - 1))
-                {
+                if (VerticalWallVacant(v - 1))
                     vertical.Add(v - 1);
-                    PlayerExtension.RemoveVerticalWall(v - 1);
-                }
 
-                if (PlayerExtension.PlaceVerticalWall((v - 1) - BOARD_SIZE))
-                {
+                if (VerticalWallVacant((v - 1) - BOARD_SIZE))
                     vertical.Add((v - 1) - BOARD_SIZE);
-                    PlayerExtension.RemoveVerticalWall((v - 1) - BOARD_SIZE);
-                }
                 #endregion
             }
 

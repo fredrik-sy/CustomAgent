@@ -60,7 +60,7 @@ namespace Quoridor.AI
             }
         }
 
-        public static bool Active(this Player player)
+        public static bool MyTurn(this Player player)
         {
             return TurnHistory[player.Color];
         }
@@ -81,7 +81,7 @@ namespace Quoridor.AI
         {
             return GoalLocation[player.Color];
         }
-        
+
         public static int Position(this Player player)
         {
             return MoveHistory[player.Color].Count == 0 ? QuoridorGraph.BOARD_SIZE * player.Position.Y + player.Position.X : MoveHistory[player.Color].Peek();
@@ -100,34 +100,12 @@ namespace Quoridor.AI
             return WallCount[player.Color];
         }
 
-        public static bool HasWall(this Player player)
-        {
-            return WallCount[player.Color] > 0;
-        }
-
         public static bool PlaceHorizontalWall(this Player player, int v)
         {
-            if (PlaceHorizontalWall(v))
+            if (QuoridorGraph.PlaceHorizontalWall(v))
             {
                 WallCount[player.Color] = WallCount[player.Color] - 1;
                 RotateTurn();
-                return true;
-            }
-
-            return false;
-        }
-
-        public static bool PlaceHorizontalWall(int v)
-        {
-            if (v < 0 || v >= QuoridorGraph.SQUARE_SPACES ||
-                QuoridorGraph.ToX(v) > QuoridorGraph.BOARD_SIZE - 2 ||
-                QuoridorGraph.ToY(v) > QuoridorGraph.BOARD_SIZE - 2)
-                return false;
-
-            if (QuoridorGraph.Graph.IsAdj(v, v + QuoridorGraph.BOARD_SIZE) && QuoridorGraph.Graph.IsAdj(v + 1, (v + 1) + QuoridorGraph.BOARD_SIZE))
-            {
-                QuoridorGraph.Graph.RemoveUndirectedEdge(v, v + QuoridorGraph.BOARD_SIZE);
-                QuoridorGraph.Graph.RemoveUndirectedEdge(v + 1, (v + 1) + QuoridorGraph.BOARD_SIZE);
                 return true;
             }
 
@@ -136,7 +114,7 @@ namespace Quoridor.AI
 
         public static bool PlaceVerticalWall(this Player player, int v)
         {
-            if (PlaceVerticalWall(v))
+            if (QuoridorGraph.PlaceVerticalWall(v))
             {
                 WallCount[player.Color] = WallCount[player.Color] - 1;
                 RotateTurn();
@@ -146,57 +124,18 @@ namespace Quoridor.AI
             return false;
         }
 
-        public static bool PlaceVerticalWall(int v)
-        {
-            if (v < 0 || v >= QuoridorGraph.SQUARE_SPACES ||
-                QuoridorGraph.ToX(v) > QuoridorGraph.BOARD_SIZE - 2 ||
-                QuoridorGraph.ToY(v) > QuoridorGraph.BOARD_SIZE - 2)
-                return false;
-
-            if (QuoridorGraph.Graph.IsAdj(v, v + 1) && QuoridorGraph.Graph.IsAdj(v + QuoridorGraph.BOARD_SIZE, (v + 1) + QuoridorGraph.BOARD_SIZE))
-            {
-                QuoridorGraph.Graph.RemoveUndirectedEdge(v, v + 1);
-                QuoridorGraph.Graph.RemoveUndirectedEdge(v + QuoridorGraph.BOARD_SIZE, (v + 1) + QuoridorGraph.BOARD_SIZE);
-                return true;
-            }
-
-            return false;
-        }
-
         public static void RemoveHorizontalWall(this Player player, int v)
         {
-            RemoveHorizontalWall(v);
+            QuoridorGraph.RemoveHorizontalWall(v);
             WallCount[player.Color] = WallCount[player.Color] + 1;
             RotateTurn();
-        }
-
-        public static void RemoveHorizontalWall(int v)
-        {
-            if (v < 0 || v >= QuoridorGraph.SQUARE_SPACES ||
-                QuoridorGraph.ToX(v) > QuoridorGraph.BOARD_SIZE - 2 ||
-                QuoridorGraph.ToY(v) > QuoridorGraph.BOARD_SIZE - 2)
-                throw new ArgumentException();
-            
-            QuoridorGraph.Graph.AddUndirectedEdge(v, v + QuoridorGraph.BOARD_SIZE);
-            QuoridorGraph.Graph.AddUndirectedEdge(v + 1, (v + 1) + QuoridorGraph.BOARD_SIZE);
         }
 
         public static void RemoveVerticalWall(this Player player, int v)
         {
-            RemoveVerticalWall(v);
+            QuoridorGraph.RemoveVerticalWall(v);
             WallCount[player.Color] = WallCount[player.Color] + 1;
             RotateTurn();
-        }
-
-        public static void RemoveVerticalWall(int v)
-        {
-            if (v < 0 || v >= QuoridorGraph.SQUARE_SPACES ||
-                QuoridorGraph.ToX(v) > QuoridorGraph.BOARD_SIZE - 2 ||
-                QuoridorGraph.ToY(v) > QuoridorGraph.BOARD_SIZE - 2)
-                throw new ArgumentException();
-
-            QuoridorGraph.Graph.AddUndirectedEdge(v, v + 1);
-            QuoridorGraph.Graph.AddUndirectedEdge(v + QuoridorGraph.BOARD_SIZE, (v + 1) + QuoridorGraph.BOARD_SIZE);
         }
         #endregion
     }
