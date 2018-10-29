@@ -62,7 +62,7 @@ namespace Quoridor.AI
                                 {
                                     OpponentCloseBy = true;
 
-                                    if (player.Active())
+                                    if (player.MyTurn())
                                         continue;
                                     else
                                         collisionOccurred = true;
@@ -72,7 +72,7 @@ namespace Quoridor.AI
                             {
                                 if (v == collision.Path[collision.Path.Count - (alt - 1)])  /* LIFO List */
                                 {
-                                    if (player.Active())
+                                    if (player.MyTurn())
                                     {
                                         collisionCheckpoint = u;
                                         continue;
@@ -89,7 +89,7 @@ namespace Quoridor.AI
                             {
                                 if (v == collision.Path[collision.Path.Count - alt])
                                 {
-                                    if (player.Active())
+                                    if (player.MyTurn())
                                     {
                                         collisionOccurred = true;
                                     }
