@@ -87,24 +87,27 @@ namespace Quoridor.AI
             }
 
             #region EvaluateMove
-            int v = dijkstraSelf.Path.Peek();
-
-            PlayerExtension.Self.Move(v);
-
-            score = AlphaBetaPruning.Evaluate(ALPHA_BETA_PRUNING_DEPTH, int.MinValue, int.MaxValue, false);
-
-            if (actionScore < score)
+            if (dijkstraSelf.Path.Count > 0)
             {
-                action = new MoveAction(QuoridorGraph.ToX(v), QuoridorGraph.ToY(v));
-                actionScore = score;
-            }
+                int v = dijkstraSelf.Path.Peek();
 
-            PlayerExtension.Self.RevertMove();
+                PlayerExtension.Self.Move(v);
+
+                score = AlphaBetaPruning.Evaluate(ALPHA_BETA_PRUNING_DEPTH, int.MinValue, int.MaxValue, false);
+
+                if (actionScore < score)
+                {
+                    action = new MoveAction(QuoridorGraph.ToX(v), QuoridorGraph.ToY(v));
+                    actionScore = score;
+                }
+
+                PlayerExtension.Self.RevertMove();
+            }
             #endregion
 
-            //Debug.Print(action.GetType().IsAssignableFrom(typeof(MoveAction)) ?
-            //    ((Func<MoveAction, string>)((MoveAction moveAction) => "(" + moveAction.Column + ", " + moveAction.Row + ")"))((MoveAction)action) :
-            //    ((Func<PlaceWallAction, string>)((PlaceWallAction placeWallAction) => "(" + placeWallAction.Column + ", " + placeWallAction.Row + ") " + placeWallAction.WallAlignment))((PlaceWallAction)action));
+            Debug.Print(action.GetType().IsAssignableFrom(typeof(MoveAction)) ?
+                ((Func<MoveAction, string>)((MoveAction moveAction) => "(" + moveAction.Column + ", " + moveAction.Row + ")"))((MoveAction)action) :
+                ((Func<PlaceWallAction, string>)((PlaceWallAction placeWallAction) => "(" + placeWallAction.Column + ", " + placeWallAction.Row + ") " + placeWallAction.WallAlignment))((PlaceWallAction)action));
 
             return action;
         }

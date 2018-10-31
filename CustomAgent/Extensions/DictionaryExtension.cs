@@ -8,10 +8,11 @@ namespace Quoridor.AI
 {
     static class DictionaryExtension
     {
-        public static Dictionary<TKey, TSource> Join<TKey, TSource>(this Dictionary<TKey, TSource> source, Dictionary<TKey, TSource> other)
+        public static Dictionary<TKey, TSource> Join<TKey, TSource>(this Dictionary<TKey, TSource> source, Dictionary<TKey, TSource> other) where TSource : HashSet<int>
         {
             foreach (var o in other)
-                source[o.Key] = o.Value;
+                foreach (int v in o.Value)
+                    source[o.Key].Add(v);
 
             return source;
         }

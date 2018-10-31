@@ -58,7 +58,7 @@ namespace Quoridor.AI
             return PlayerExtension.Self.Position() == v || PlayerExtension.Opponent.Position() == v;
         }
 
-        public IEnumerable<int> Adj(int v)
+        public HashSet<int> Adj(int v)
         {
             return adj[v];
         }

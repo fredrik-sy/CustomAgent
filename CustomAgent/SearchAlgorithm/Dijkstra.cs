@@ -136,13 +136,15 @@ namespace Quoridor.AI
                             w = v;
 
                             /* Avoid Opponents Path If Possible */
-                            if (collision.Path != null && !collision.Path.Contains(distance[v]))
+                            if (collision.Path != null && !collision.Path.Contains(v))
                                 break;
                         }
                     }
 
                     if (w != -1)
                         Path = ReconstructPath(w, distance, previous);
+                    else if (graph.Adj(player.Position()).Count > 0)
+                        Path = new List<int>(); /* Isolated In A Corner */
                 }
             }
 

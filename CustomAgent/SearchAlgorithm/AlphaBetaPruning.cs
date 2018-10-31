@@ -11,9 +11,6 @@ namespace Quoridor.AI
     {
         public static int Evaluate(int depth, int alpha, int beta, bool maximizingPlayer)
         {
-            if (ReachedTerminal(depth, maximizingPlayer, out int heuristicValue))
-                return heuristicValue;
-
             Dijkstra dijkstraSelf = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Self);
             Dijkstra dijkstraOpponent = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Opponent);
 
@@ -24,22 +21,33 @@ namespace Quoridor.AI
             if (dijkstraSelf.Path == null || dijkstraOpponent.Path == null)
                 return maximizingPlayer ? int.MaxValue : int.MinValue;
 
+            /* Corner Isolation */
+            if (dijkstraSelf.Path.Count == 0 || dijkstraOpponent.Path.Count == 0)
+                return 0;
+
+            if (ReachedTerminal(depth, maximizingPlayer, out int heuristicValue))
+                return heuristicValue;
+
             if (maximizingPlayer)
             {
-                int v = dijkstraSelf.Path.Peek();
                 int value = int.MinValue;
 
-                PlayerExtension.Self.Move(v);
-                value = Max(value, Evaluate(depth - 1, alpha, beta, !maximizingPlayer));
-                alpha = Max(alpha, value);
-                PlayerExtension.Self.RevertMove();
+                if (dijkstraSelf.Path.Count > 0)
+                {
+                    int v = dijkstraSelf.Path.Peek();
 
-                if (alpha >= beta)
-                    return value;
+                    PlayerExtension.Self.Move(v);
+                    value = Max(value, Evaluate(depth - 1, alpha, beta, !maximizingPlayer));
+                    alpha = Max(alpha, value);
+                    PlayerExtension.Self.RevertMove();
+
+                    if (alpha >= beta)
+                        return value;
+                }
 
                 if (PlayerExtension.Self.NumberOfWalls() > 0)
                 {
-                    if (dijkstraSelf.Path.Count > dijkstraOpponent.Path.Count)
+                    if (dijkstraSelf.Path.Count > dijkstraOpponent.Path.Count || dijkstraSelf.OpponentCloseBy)
                     {
                         var wallPositions = QuoridorGraph.WallPossibilities(dijkstraOpponent.Path, CustomAgent.LIMIT_WALL_BEGIN_COUNT, CustomAgent.LIMIT_WALL_END_COUNT);
 
@@ -75,20 +83,24 @@ namespace Quoridor.AI
             }
             else
             {
-                int v = dijkstraOpponent.Path.Peek();
                 int value = int.MaxValue;
 
-                PlayerExtension.Opponent.Move(v);
-                value = Min(value, Evaluate(depth - 1, alpha, beta, !maximizingPlayer));
-                beta = Min(beta, value);
-                PlayerExtension.Opponent.RevertMove();
+                if (dijkstraOpponent.Path.Count > 0)
+                {
+                    int v = dijkstraOpponent.Path.Peek();
 
-                if (alpha >= beta)
-                    return value;
+                    PlayerExtension.Opponent.Move(v);
+                    value = Min(value, Evaluate(depth - 1, alpha, beta, !maximizingPlayer));
+                    beta = Min(beta, value);
+                    PlayerExtension.Opponent.RevertMove();
+
+                    if (alpha >= beta)
+                        return value;
+                }
 
                 if (PlayerExtension.Opponent.NumberOfWalls() > 0)
                 {
-                    if (dijkstraOpponent.Path.Count > dijkstraSelf.Path.Count)
+                    if (dijkstraOpponent.Path.Count > dijkstraSelf.Path.Count || dijkstraOpponent.OpponentCloseBy)
                     {
                         var wallPositions = QuoridorGraph.WallPossibilities(dijkstraSelf.Path, CustomAgent.LIMIT_WALL_BEGIN_COUNT, CustomAgent.LIMIT_WALL_END_COUNT);
 
