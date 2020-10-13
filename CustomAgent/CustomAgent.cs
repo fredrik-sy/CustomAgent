@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using BreadthFirstSearch = CustomAgent.BreadthFirstSearch;
+using QuoridorGraph = CustomAgent.QuoridorGraph;
+using QuoridorPlayer = CustomAgent.QuoridorPlayer;
 
 namespace Quoridor.AI
 {
@@ -21,9 +24,7 @@ namespace Quoridor.AI
         public override Action DoAction(GameData status)
         {
             QuoridorGraph.CreateGraph(status.Tiles, status.HorizontalWall, status.VerticalWall);
-            PlayerExtension.Self = status.Self;
-            PlayerExtension.Opponent = status.Players.Find(o => !o.Equals(status.Self));
-            PlayerExtension.Initialize(status.Tiles);
+            QuoridorPlayer.CreatePlayer(status.Tiles, status.Self, status.Players);
             return NextAction();
         }
 
@@ -33,15 +34,10 @@ namespace Quoridor.AI
             int actionScore = int.MinValue;
             int score;
 
-            Dijkstra dijkstraSelf = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Self);
-            Dijkstra dijkstraOpponent = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Opponent);
-
-            dijkstraSelf.CreatePath();
-
-            var selfUntouchedWallPositions = QuoridorGraph.WallPossibilities(dijkstraSelf.Path, LIMIT_WALL_BEGIN_COUNT, LIMIT_WALL_END_COUNT);
-
-            dijkstraOpponent.CreatePath(dijkstraSelf);
-
+            var paths = BreadthFirstSearch.CreatePaths();
+            
+            var selfUntouchedWallPositions = QuoridorGraph.WallPossibilities();
+            
             if (PlayerExtension.Self.NumberOfWalls() > 0)
             {
                 if (dijkstraSelf.Path.Count > dijkstraOpponent.Path.Count || dijkstraSelf.OpponentCloseBy)

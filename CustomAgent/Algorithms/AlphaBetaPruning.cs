@@ -11,8 +11,8 @@ namespace Quoridor.AI
     {
         public static int Evaluate(int depth, int alpha, int beta, bool maximizingPlayer)
         {
-            Dijkstra dijkstraSelf = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Self);
-            Dijkstra dijkstraOpponent = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Opponent);
+            Dijkstra dijkstraSelf = new Dijkstra(QuoridorGraph.BoardGraph, PlayerExtension.Self);
+            Dijkstra dijkstraOpponent = new Dijkstra(QuoridorGraph.BoardGraph, PlayerExtension.Opponent);
 
             dijkstraSelf.CreatePath();
             dijkstraOpponent.CreatePath(dijkstraSelf);
@@ -143,8 +143,8 @@ namespace Quoridor.AI
                 PlayerExtension.Self.Goals().Contains(PlayerExtension.Self.Position()) ||
                 PlayerExtension.Opponent.Goals().Contains(PlayerExtension.Opponent.Position()))
             {
-                Dijkstra dijkstraSelf = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Self);
-                Dijkstra dijkstraOpponent = new Dijkstra(QuoridorGraph.Graph, PlayerExtension.Opponent);
+                Dijkstra dijkstraSelf = new Dijkstra(QuoridorGraph.BoardGraph, PlayerExtension.Self);
+                Dijkstra dijkstraOpponent = new Dijkstra(QuoridorGraph.BoardGraph, PlayerExtension.Opponent);
 
                 dijkstraSelf.CreatePath();
                 dijkstraOpponent.CreatePath();

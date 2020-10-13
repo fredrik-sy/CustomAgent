@@ -4,17 +4,41 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quoridor.AI
+namespace CustomAgent
 {
     static class DictionaryExtension
     {
-        public static Dictionary<TKey, TSource> Join<TKey, TSource>(this Dictionary<TKey, TSource> source, Dictionary<TKey, TSource> other) where TSource : HashSet<int>
+        public static void Insert<TKey, TSource, TValue>(this IDictionary<TKey, TSource> source, TKey key, TValue value) where TSource : ICollection<TValue>, new()
         {
-            foreach (var o in other)
-                foreach (int v in o.Value)
-                    source[o.Key].Add(v);
+            if (source[key] == null)
+                source[key] = new TSource();
 
-            return source;
+            source[key].Add(value);
+        }
+
+        public static TSource MinByKey<TSource>(this IDictionary<int, TSource> source) where TSource : new()
+        {
+            int value = 0;
+            bool hasValue = false;
+
+            foreach (int key in source.Keys)
+            {
+                if (hasValue)
+                {
+                    if (key < value)
+                        value = key;
+                }
+                else
+                {
+                    value = key;
+                    hasValue = true;
+                }
+            }
+
+            if (hasValue)
+                return source[value];
+
+            return new TSource();
         }
     }
 }

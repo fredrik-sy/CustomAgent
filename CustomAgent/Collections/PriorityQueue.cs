@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quoridor.AI
+namespace CustomAgent
 {
     class PriorityQueue<TKey> where TKey : IComparable
     {
@@ -24,13 +24,7 @@ namespace Quoridor.AI
 
         public int Count { get; private set; }
 
-        public bool Empty
-        {
-            get
-            {
-                return Count == 0;
-            }
-        }
+        public bool Empty { get => Count == 0; }
 
         public bool Contains(int i)
         {
@@ -75,7 +69,7 @@ namespace Quoridor.AI
             pq[Count + 1] = -1;
             return min;
         }
-        
+
         public void Insert(int i, TKey key)
         {
             if (Contains(i))

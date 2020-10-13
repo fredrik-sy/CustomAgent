@@ -4,17 +4,20 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Point = Microsoft.Xna.Framework.Point;
 
-namespace Quoridor.AI
+namespace CustomAgent
 {
     class Graph
     {
         private HashSet<int>[] adj;
 
-        public Graph(int v)
+        public Graph(int x, int y)
         {
-            V = v;
+            V = ToOneDimension(x, y);
             E = 0;
+            X = x;
+            Y = y;
             adj = new HashSet<int>[V];
             Initialize();
         }
@@ -23,17 +26,32 @@ namespace Quoridor.AI
 
         public int E { get; private set; }
 
+        public int X { get; private set; }
+
+        public int Y { get; private set; }
+
         private void Initialize()
         {
             for (int v = 0; v < V; v++)
                 adj[v] = new HashSet<int>();
         }
 
+        public void AddUndirectedEdge(int x1, int y1, int x2, int y2)
+        {
+            AddUndirectedEdge(ToOneDimension(x1, y1), ToOneDimension(x2, y2));
+        }
+
+        public void AddUndirectedEdge(Point v, Point w)
+        {
+            AddUndirectedEdge(ToOneDimension(v), ToOneDimension(w));
+        }
+
         public void AddUndirectedEdge(int v, int w)
         {
             E++;
-            adj[v].Add(w);
-            adj[w].Add(v);
+
+            if (adj[v].Add(w) && adj[w].Add(v) == false)
+                throw new ArgumentException();
         }
 
         public void RemoveUndirectedEdge(int v, int w)
@@ -43,19 +61,9 @@ namespace Quoridor.AI
             adj[w].Remove(v);
         }
 
-        public bool UndirectedEdgeExists(int v, int w)
-        {
-            return adj[v].Contains(w) && adj[w].Contains(v);
-        }
-
         public bool IsAdj(int v, int w)
         {
             return adj[v].Contains(w);
-        }
-
-        public bool IsOccupied(int v)
-        {
-            return PlayerExtension.Self.Position() == v || PlayerExtension.Opponent.Position() == v;
         }
 
         public HashSet<int> Adj(int v)
@@ -63,9 +71,29 @@ namespace Quoridor.AI
             return adj[v];
         }
 
-        public int Degree(int v)
+        public int ToOneDimension(Point p)
         {
-            return adj[v].Count;
+            return ToOneDimension(p.X, p.Y);
+        }
+
+        public int ToOneDimension(int x, int y)
+        {
+            return X * y + x;
+        }
+
+        public Point ToTwoDimension(int v)
+        {
+            return new Point(ToX(v), ToY(v));
+        }
+
+        public int ToX(int v)
+        {
+            return v % X;
+        }
+
+        public int ToY(int v)
+        {
+            return v / X;
         }
     }
 }
